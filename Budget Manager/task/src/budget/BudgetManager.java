@@ -19,10 +19,6 @@ public class BudgetManager {
         this.balance = getBalance();
     }
 
-    private double getBalance() {
-        return this.totalIncome - this.totalExpense;
-    }
-
     private static String menu() {
         return """
                 Choose your action:
@@ -39,45 +35,52 @@ public class BudgetManager {
             int choice = KeyboardUtil.getNumber(menu());
             switch (choice) {
                 case 1:
-                    int income = KeyboardUtil.getNumber("\nEnter income:");
-                    this.totalIncome += income;
-                    System.out.println("Income was added!\n");
-                    System.out.println("New income: " + income + "\n");
-                    System.out.println("Total income: " + this.totalIncome + "\n");
+                    addIncome();
                     break;
                 case 2:
-                    System.out.println("2");
+                    addPurchase();
                     break;
                 case 3:
-                    System.out.println("3");
+                    showPurchases();
                     break;
                 case 4:
-                    System.out.println("Total income: " + this.totalIncome + " Total expence: " + this.totalExpense + "\n");
-                    System.out.println("\nBalance:" + String.format("%.2f", getBalance()) + "\n");
+                    System.out.println("\nBalance: $" + String.format("%.2f", getBalance()) + "\n");
                     break;
                 case 0:
+                    System.out.println("\nBye!");
                     keepGoing = false;
             }
         }
     }
 
-    public static void calculateTotalExpense(List<Purchase> purchaseList) {
-        double total = 0;
-
-        for (Purchase p : purchaseList) {
-            System.out.println(p.getName() + " $" + String.format("%.2f",p.getPrice()));
-            total += p.getPrice();
-        }
-        System.out.println("Total: $" + String.format("%.2f", total));
+    private void addIncome() {
+        int income = KeyboardUtil.getNumber("\nEnter income:");
+        this.totalIncome += income;
+        System.out.println("Income was added!\n");
     }
 
-    public static List<Purchase> getPurchaseList() {
-        List<Purchase> purchaseList = new ArrayList<>();
+    private void addPurchase() {
+        String name = KeyboardUtil.getInput("\nEnter purchase name:");
+        double price = KeyboardUtil.getDouble("Enter its price:");
+        Purchase p = new Purchase(name, price);
+        purchaseList.add(p);
+        this.totalExpense += p.getPrice();
+        System.out.println("Purchase was added!\n");
+    }
 
-        while (KeyboardUtil.hasNextLine()) {
-            String purchase = KeyboardUtil.getInput();
-            purchaseList.add(new Purchase(purchase));
+    public double getBalance() {
+        return this.totalIncome - this.totalExpense;
+    }
+    public void showPurchases() {
+
+        if (this.purchaseList.isEmpty()) {
+            System.out.println("\nThe purchase list is empty\n");
+            return;
         }
-        return purchaseList;
+        System.out.println("\n");
+        for (Purchase p : this.purchaseList) {
+            System.out.println(p.getName() + " $" + String.format("%.2f",p.getPrice()));
+        }
+        System.out.println("Total sum: $" + String.format("%.2f", this.totalExpense) + "\n");
     }
 }
